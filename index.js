@@ -9,7 +9,7 @@
 // const BACKEND_URL = "https://mcx-live-backend.onrender.com";
 // ---------------------------------------------------------------
 
-const BACKEND_URL = "https://YOUR-RENDER-BACKEND-URL.onrender.com";
+const BACKEND_URL = "https://maketb.onrender.com";
 
 // ---------------------------------------------------------------
 // DOM ELEMENTS
