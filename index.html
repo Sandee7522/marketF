@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Live MCX Chart</title>
+
+    <link rel="stylesheet" href="index.css" />
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <script src="https://unpkg.com/lightweight-charts@5.0.8/dist/lightweight-charts.standalone.production.js"></script>
+  </head>
+
+  <body>
+    <main class="container">
+      <header class="header">
+        <div class="symbol-section">
+          <h1 id="symbolHeading">Loading...</h1>
+
+          <p id="tokenSubheading">MCX live market data</p>
+        </div>
+
+        <div id="connectionStatus" class="status">
+          <span class="status-dot"></span>
+
+          <span id="statusText">Connecting...</span>
+        </div>
+
+        <select id="timeframeSelect" class="status timeframe-select">
+          <optgroup label="Seconds">
+            <option value="15s">15 seconds</option>
+            <option value="30s">30 seconds</option>
+            <option value="45s">45 seconds</option>
+          </optgroup>
+
+          <optgroup label="Minutes">
+            <option value="1m" selected>1 minute</option>
+            <option value="2m">2 minutes</option>
+            <option value="3m">3 minutes</option>
+            <option value="4m">4 minutes</option>
+            <option value="5m">5 minutes</option>
+            <option value="10m">10 minutes</option>
+            <option value="15m">15 minutes</option>
+            <option value="30m">30 minutes</option>
+            <option value="75m">75 minutes</option>
+            <option value="125m">125 minutes</option>
+          </optgroup>
+
+          <optgroup label="Hours">
+            <option value="1h">1 hour</option>
+            <option value="2h">2 hours</option>
+            <option value="3h">3 hours</option>
+            <option value="4h">4 hours</option>
+          </optgroup>
+
+          <optgroup label="Days">
+            <option value="1d">1 day</option>
+            <option value="1w">1 week</option>
+            <option value="1mo">1 month</option>
+          </optgroup>
+        </select>
+      </header>
+
+      <section class="cards">
+        <div class="card">
+          <div class="card-label">Live LTP</div>
+
+          <div id="ltp" class="card-value price-neutral">--</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Open</div>
+
+          <div id="openPrice" class="card-value">--</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">High</div>
+
+          <div id="highPrice" class="card-value">--</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Low</div>
+
+          <div id="lowPrice" class="card-value">--</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Last Tick</div>
+
+          <div id="lastTickTime" class="card-value last-tick-value">--</div>
+        </div>
+      </section>
+
+      <section class="chart-card">
+        <div class="chart-title">
+          <h2>Live Candlestick Chart</h2>
+
+          <span>Live data received from backend</span>
+        </div>
+
+        <div id="chart"></div>
+      </section>
+
+      <section class="tick-table-card">
+        <div class="table-heading">
+          <h2>Recent Live Ticks</h2>
+        </div>
+
+        <div class="tick-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Symbol</th>
+                <th>Token</th>
+                <th>LTP</th>
+                <th>Raw LTP</th>
+              </tr>
+            </thead>
+
+            <tbody id="tickTableBody">
+              <tr id="emptyTickRow">
+                <td colspan="5" class="empty-message">
+                  Waiting for live ticks...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="index.js"></script>
+  </body>
+</html>
