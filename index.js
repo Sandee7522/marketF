@@ -172,6 +172,9 @@ const TIMEFRAME_SECONDS = {
 
 let currentTimeframe = timeframeSelect.value;
 
+let currentSymbol = null;
+let currentToken = null;
+
 const tickHistory = [];
 
 let currentCandle = null;
