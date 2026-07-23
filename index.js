@@ -296,7 +296,7 @@ async function loadStoredCandles() {
       limit: "1000",
     });
 
-    const url = `${BACKEND_URL}/api/candles?${params.toString()}`;
+    const url = `${BACKEND_URL}/api/candles/history?${params.toString()}`;
 
     console.log("Fetching stored candles:", url);
 
