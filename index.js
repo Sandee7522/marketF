@@ -24,6 +24,12 @@ const highPriceElement = document.getElementById("highPrice");
 const lowPriceElement = document.getElementById("lowPrice");
 const lastTickTimeElement = document.getElementById("lastTickTime");
 
+// new: nearest elements & B & C
+
+const nearest50Element = document.getElementById("nearest50");
+const buyStrikeElement = document.getElementById("buyStrike");
+const sellStrikeElement = document.getElementById("sellStrike");
+
 const connectionStatusElement =
   document.getElementById("connectionStatus");
 
@@ -234,6 +240,20 @@ function formatPrice(price) {
   });
 }
 
+
+// whole strike value (nearest 50) for nearest50Element
+
+function formateStrike(value) {
+  const numericValue = Number(value);
+
+  if(!Number.isFinite(numericValue)){
+    return "--"
+  }
+  
+return numericValue.toLocaleString("en-IN");
+
+}
+
 function escapeHtml(value) {
   return String(value ?? "--")
     .replaceAll("&", "&amp;")
@@ -267,6 +287,24 @@ function updateLtpColor(currentPrice) {
 
   previousLtp = currentPrice;
 }
+
+// Updates the Nearest 50 / Buy Strike / Sell Strike cards. Falls back
+// to "--" gracefully if an older backend (without these fields) is
+// ever connected to, so this never throws.
+function updateStrikeCards(tick) {
+  if (
+    tick.nearest50 === undefined ||
+    tick.buyStrike === undefined ||
+    tick.sellStrike === undefined
+  ) {
+    return;
+  }
+ 
+  nearest50Element.textContent = formatStrike(tick.nearest50);
+  buyStrikeElement.textContent = formatStrike(tick.buyStrike);
+  sellStrikeElement.textContent = formatStrike(tick.sellStrike);
+}
+ 
 
 function updateCurrentCandleCards() {
   if (!currentCandle) {
