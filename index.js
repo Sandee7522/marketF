@@ -57,10 +57,17 @@ async function loadBackendConfig() {
 
     const config = await response.json();
 
-    symbolHeading.textContent = config.symbol || "Unknown Symbol";
+    // symbolHeading.textContent = config.symbol || "Unknown Symbol";
+
+    // tokenSubheading.textContent =
+    //   `MCX live market data | Token: ${config.token || "--"}`;
+    currentSymbol = config.symbol || null ;
+    currentToken = String(config.token || "");
+
+    symbolHeading.textContent = currentSymbol || "Unknown Symbol";
 
     tokenSubheading.textContent =
-      `MCX live market data | Token: ${config.token || "--"}`;
+      `MCX live market data | Token: ${currentToken || "--"}`;
   } catch (error) {
     symbolHeading.textContent = "Config unavailable";
 
@@ -71,7 +78,10 @@ async function loadBackendConfig() {
   }
 }
 
-loadBackendConfig();
+await loadBackendConfig();
+
+
+
 
 // ---------------------------------------------------------------
 // CHART INITIALIZATION
@@ -269,6 +279,103 @@ function updateCurrentCandleCards() {
   lowPriceElement.textContent = formatPrice(currentCandle.low);
 }
 
+async function loadStoredCandles() {
+  if (!currentSymbol || !currentToken) {
+    console.warn("Symbol or token missing");
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      symbol: currentSymbol,
+      token: currentToken,
+      interval: currentTimeframe,
+      limit: "1000",
+    });
+
+    const url = `${BACKEND_URL}/api/candles?${params.toString()}`;
+
+    console.log("Fetching stored candles:", url);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(
+        `Candles request failed: ${response.status}`,
+      );
+    }
+
+    const result = await response.json();
+
+    console.log("Stored candles response:", result);
+
+    const storedCandles = Array.isArray(result.data)
+      ? result.data
+      : [];
+
+    const chartCandles = storedCandles
+      .map((candle) => {
+        const rawTime =
+          candle.time ??
+          candle.timestamp ??
+          candle.datetime;
+
+        let time;
+
+        if (typeof rawTime === "number") {
+          time =
+            rawTime > 9999999999
+              ? Math.floor(rawTime / 1000)
+              : rawTime;
+        } else {
+          time = Math.floor(
+            new Date(rawTime).getTime() / 1000,
+          );
+        }
+
+        return {
+          time,
+          open: Number(candle.open),
+          high: Number(candle.high),
+          low: Number(candle.low),
+          close: Number(candle.close),
+        };
+      })
+      .filter(
+        (candle) =>
+          Number.isFinite(candle.time) &&
+          Number.isFinite(candle.open) &&
+          Number.isFinite(candle.high) &&
+          Number.isFinite(candle.low) &&
+          Number.isFinite(candle.close),
+      )
+      .sort((a, b) => a.time - b.time);
+
+    candleSeries.setData(chartCandles);
+
+    currentCandle =
+      chartCandles.length > 0
+        ? chartCandles[chartCandles.length - 1]
+        : null;
+
+    updateCurrentCandleCards();
+
+    console.log(
+      "Stored candles loaded:",
+      chartCandles.length,
+    );
+
+    if (chartCandles.length > 0) {
+      chart.timeScale().fitContent();
+    }
+  } catch (error) {
+    console.error(
+      "Failed to load stored candles:",
+      error,
+    );
+  }
+}
+
 // ---------------------------------------------------------------
 // CANDLE FUNCTIONS
 // ---------------------------------------------------------------
@@ -403,21 +510,43 @@ function addTickToTable(tick) {
 // TIMEFRAME CHANGE
 // ---------------------------------------------------------------
 
-timeframeSelect.addEventListener("change", () => {
-  currentTimeframe = timeframeSelect.value;
+// timeframeSelect.addEventListener("change", () => {
+//   currentTimeframe = timeframeSelect.value;
 
-  rebuildCandlesFromHistory();
-});
+//   rebuildCandlesFromHistory();
+// });
+
+timeframeSelect.addEventListener(
+  "change",
+  async () => {
+    currentTimeframe = timeframeSelect.value;
+
+    currentCandle = null;
+
+    candleSeries.setData([]);
+
+    await loadStoredCandles();
+  },
+);
 
 // ---------------------------------------------------------------
 // SOCKET EVENTS
 // ---------------------------------------------------------------
 
-socket.on("connect", () => {
+// socket.on("connect", () => {
+//   updateConnectionStatus(
+//     "connected",
+//     "Browser connected",
+//   );
+// });
+
+socket.on("connect", async () => {
   updateConnectionStatus(
     "connected",
     "Browser connected",
   );
+
+  await loadStoredCandles();
 });
 
 socket.on("connection_status", (data) => {
