@@ -78,7 +78,7 @@ async function loadBackendConfig() {
   }
 }
 
-await loadBackendConfig();
+loadBackendConfig();
 
 
 
