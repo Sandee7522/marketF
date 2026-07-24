@@ -9,7 +9,8 @@
 // const BACKEND_URL = "https://mcx-live-backend.onrender.com";
 // ---------------------------------------------------------------
 
-const BACKEND_URL = "https://maketb.onrender.com";
+// const BACKEND_URL = "https://maketb.onrender.com";
+const BACKEND_URL = "http://127.0.0.1:5000";
 
 // ---------------------------------------------------------------
 // DOM ELEMENTS
@@ -292,17 +293,35 @@ function updateLtpColor(currentPrice) {
 // to "--" gracefully if an older backend (without these fields) is
 // ever connected to, so this never throws.
 function updateStrikeCards(tick) {
+
+
+  console.log("===== updateStrikeCards =====");
+
+  console.log("nearest50:", tick.nearest50);
+  console.log("buyStrike:", tick.buyStrike);
+  console.log("sellStrike:", tick.sellStrike);
+
+  console.log("buy_strike:", tick.buy_strike);
+  console.log("sell_strike:", tick.sell_strike);
+
+  console.log("Full Tick:");
+  console.log(JSON.stringify(tick, null, 2));
   if (
     tick.nearest50 === undefined ||
     tick.buyStrike === undefined ||
     tick.sellStrike === undefined
   ) {
+        console.warn("Strike fields missing");
+
     return;
   }
 
   nearest50Element.textContent = formatStrike(tick.nearest50);
   buyStrikeElement.textContent = formatStrike(tick.buyStrike);
   sellStrikeElement.textContent = formatStrike(tick.sellStrike);
+
+    console.log("Cards Updated");
+
 }
  
 
@@ -599,6 +618,8 @@ socket.on("connection_status", (data) => {
 
 socket.on("live_tick", (tick) => {
   console.log("========== LIVE TICK ==========");
+  console.log(JSON.stringify(tick, null, 2));
+  console.log(Object.keys(tick));
   console.log(tick);
 
   const currentPrice = Number(tick.ltp);
