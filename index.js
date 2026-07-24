@@ -249,8 +249,8 @@ function formateStrike(value) {
   if(!Number.isFinite(numericValue)){
     return "--"
   }
-  
-return numericValue.toLocaleString("en-IN");
+
+  return numericValue.toLocaleString("en-IN");
 
 }
 
@@ -299,7 +299,7 @@ function updateStrikeCards(tick) {
   ) {
     return;
   }
- 
+
   nearest50Element.textContent = formatStrike(tick.nearest50);
   buyStrikeElement.textContent = formatStrike(tick.buyStrike);
   sellStrikeElement.textContent = formatStrike(tick.sellStrike);
@@ -536,6 +536,9 @@ function addTickToTable(tick) {
     <td>${escapeHtml(tick.token)}</td>
     <td>${formatPrice(tick.ltp)}</td>
     <td>${escapeHtml(tick.rawLtp)}</td>
+    <td>${formatStrike(tick.nearest50)}</td>
+    <td>${formatStrike(tick.buyStrike)}</td>
+    <td>${formatStrike(tick.sellStrike)}</td>
   `;
 
   tickTableBody.prepend(row);
@@ -551,24 +554,11 @@ function addTickToTable(tick) {
 // TIMEFRAME CHANGE
 // ---------------------------------------------------------------
 
-// timeframeSelect.addEventListener("change", () => {
-//   currentTimeframe = timeframeSelect.value;
+timeframeSelect.addEventListener("change", () => {
+  currentTimeframe = timeframeSelect.value;
 
-//   rebuildCandlesFromHistory();
-// });
-
-timeframeSelect.addEventListener(
-  "change",
-  async () => {
-    currentTimeframe = timeframeSelect.value;
-
-    currentCandle = null;
-
-    candleSeries.setData([]);
-
-    await loadStoredCandles();
-  },
-);
+  rebuildCandlesFromHistory();
+});
 
 // ---------------------------------------------------------------
 // SOCKET EVENTS
@@ -586,8 +576,6 @@ socket.on("connect", async () => {
     "connected",
     "Browser connected",
   );
-
-  await loadStoredCandles();
 });
 
 socket.on("connection_status", (data) => {
@@ -620,6 +608,7 @@ socket.on("live_tick", (tick) => {
   lastTickTimeElement.textContent =
     tick.dateTime || "--";
 
+  updateStrikeCards(tick);
   updateCandle(tick);
   addTickToTable(tick);
 
