@@ -43,7 +43,7 @@ const timeframeSelect = document.getElementById("timeframeSelect");
 // ---------------------------------------------------------------
 
 const socket = io(BACKEND_URL, {
-  transports: ["websocket", "polling"],
+  transports: ["polling"],
   reconnection: true,
   reconnectionAttempts: Infinity,
   reconnectionDelay: 1000,
@@ -170,9 +170,6 @@ const TIMEFRAME_SECONDS = {
 };
 
 let currentTimeframe = timeframeSelect.value;
-
-let currentSymbol = null;
-let currentToken = null;
 
 const tickHistory = [];
 
