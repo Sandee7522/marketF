@@ -9,8 +9,10 @@
 // const BACKEND_URL = "https://mcx-live-backend.onrender.com";
 // ---------------------------------------------------------------
 
-// const BACKEND_URL = "https://maketb.onrender.com";
-const BACKEND_URL = "http://127.0.0.1:5000";
+const BACKEND_URL = "https://maketb.onrender.com";
+
+// for local
+// const BACKEND_URL = "http://127.0.0.1:5000";
 
 // ---------------------------------------------------------------
 // DOM ELEMENTS
